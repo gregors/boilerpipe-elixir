@@ -7,10 +7,10 @@ defmodule Boilerpipe.Util.UnicodeTokenizer do
     # split words on spaces
 
     text
-    |> String.replace(~r/\b/, "\u2063")
+    |> String.replace(~r/\b/u, "\u{2063}")
     |> String.replace(~r/[\x{2063}]*(["'.,!@-\\:;$?()\/])[\x{2063}]*/u, "\\1")
     |> String.replace(~r/[ \x{2063}]+/u, " ")
     |> String.trim
-    |> String.split(~r/[ ]+/)
+    |> String.split(~r/[ ]+/u)
   end
 end
