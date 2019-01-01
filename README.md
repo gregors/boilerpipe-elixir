@@ -14,8 +14,11 @@ def deps do
   ]
 end
 ```
+## Running on docker
+
+    docker build -t boilerpipe-elixir .
+    docker run -it --rm boilerpipe-elixir
 
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/boilerpipe](https://hexdocs.pm/boilerpipe).
-
