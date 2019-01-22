@@ -1,4 +1,4 @@
-defmodule Boilerpipe.Documednt.TextBlock do
+defmodule Boilerpipe.Document.TextBlock do
   defstruct num_words: 0,
     num_words_in_wrapped_lines: 0,
     num_words_in_anchor_text: 0,
@@ -13,6 +13,10 @@ defmodule Boilerpipe.Documednt.TextBlock do
     num_full_text_words: 0,
     is_content?: false
 
+  def set_tag_level(text_block, level) do
+    %{ text_block | tag_level: level }
+  end
+
   def to_s(text_block) do
     labels = if Enum.empty?(text_block.labels), do: text_block.labels |> MapSet.to_list |> Enum.join(","), else: "null"
 
@@ -22,4 +26,5 @@ defmodule Boilerpipe.Documednt.TextBlock do
     nwl=#{text_block.num_wrapped_lines};\
     ld=#{text_block.link_density}]\t#{if text_block.is_content?, do: "CONTENT", else: "BOILERPLATE"},#{labels}\n#{text_block.text}"
   end
+
 end
