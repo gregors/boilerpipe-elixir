@@ -25,6 +25,10 @@ defmodule Boilerpipe.Document.TextBlock do
     !text_block.content
   end
 
+  def add_label(text_block, label) do
+    %{text_block | labels: MapSet.put(text_block.labels, label)}
+  end
+
   def to_s(text_block) do
     labels =
       if Enum.empty?(text_block.labels),

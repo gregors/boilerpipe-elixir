@@ -33,4 +33,12 @@ defmodule DocumentTextBockTest do
     assert tb.content == true
     assert TextBlock.is_not_content?(tb) == false
   end
+
+  test "add_label adds a label" do
+    tb = %TextBlock{}
+    assert Enum.count(tb.labels) == 0
+
+    tb = TextBlock.add_label(tb, :TITLE)
+    assert Enum.count(tb.labels) == 1
+  end
 end
