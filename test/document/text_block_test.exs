@@ -19,7 +19,7 @@ defmodule DocumentTextBockTest do
     assert tb.content == false
     assert TextBlock.is_content?(tb) == false
 
-    tb = %TextBlock{ tb | content: true }
+    tb = %TextBlock{tb | content: true}
     assert tb.content == true
     assert TextBlock.is_content?(tb) == true
   end
@@ -29,7 +29,7 @@ defmodule DocumentTextBockTest do
     assert tb.content == false
     assert TextBlock.is_not_content?(tb) == true
 
-    tb = %TextBlock{ tb | content: true }
+    tb = %TextBlock{tb | content: true}
     assert tb.content == true
     assert TextBlock.is_not_content?(tb) == false
   end

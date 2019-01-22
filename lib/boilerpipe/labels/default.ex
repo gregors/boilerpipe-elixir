@@ -11,6 +11,6 @@ defmodule Boilerpipe.Labels.Default do
   :H1
   :H2
   :H3
-  @markup_prefix "<" 
+  @markup_prefix "<"
   def markup_prefix, do: @markup_prefix
 end
