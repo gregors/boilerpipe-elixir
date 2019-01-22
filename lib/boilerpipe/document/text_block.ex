@@ -8,13 +8,21 @@ defmodule Boilerpipe.Document.TextBlock do
     text: "",
     text_density: 0,
     link_density: 0,
-    labels: %MapSet{}, 
+    labels: %MapSet{},
     tag_level: 0,
     num_full_text_words: 0,
-    is_content?: false
+    content: false
 
   def set_tag_level(text_block, level) do
     %{ text_block | tag_level: level }
+  end
+
+  def is_content?(text_block) do
+    text_block.content
+  end
+
+  def is_not_content?(text_block) do
+    !text_block.content
   end
 
   def to_s(text_block) do
