@@ -1,4 +1,4 @@
-FROM elixir:1.7.4-slim
+FROM elixir:1.10.4-slim
 
 RUN apt-get update -yqq &&  apt-get install -yqq --no-install-recommends \
   git
