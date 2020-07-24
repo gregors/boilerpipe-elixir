@@ -19,6 +19,13 @@ defmodule DocumentTextDocumentTest do
     assert TextDocument.content(td) == "one\ntwo"
   end
 
+  test ".replace_text_blocks replaces blocks" do
+    tbs = [ TextBlock.new("one"), TextBlock.new("two") ]
+    td = TextDocument.new("my title", tbs)
+
+    assert TextDocument.replace_text_blocks(td, []) == []
+  end
+
   test ".debug_s returns detailed debug info" do
     tbs = [ TextBlock.new("one"), TextBlock.new("two") ]
     td = TextDocument.new("my title", tbs)
