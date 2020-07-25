@@ -32,7 +32,7 @@ defmodule DocumentTextDocumentTest do
     assert TextDocument.text(td, true, true) == "one\ntwo"
   end
 
-  test ".debug_s returns detailed debug info" do
+  test ".to_s returns detailed debug info" do
     tbs = [ TextBlock.new("one"), TextBlock.new("two") ]
     td = TextDocument.new("my title", tbs)
 
