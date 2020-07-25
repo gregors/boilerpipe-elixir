@@ -23,7 +23,13 @@ defmodule DocumentTextDocumentTest do
     tbs = [ TextBlock.new("one"), TextBlock.new("two") ]
     td = TextDocument.new("my title", tbs)
 
-    assert TextDocument.replace_text_blocks(td, []) == []
+    assert TextDocument.replace_text_blocks(td, []) == %{ title: "my title", text_blocks: [] }
+  end
+
+  test ".text returns both content and non_content" do
+    tbs = [%TextBlock{ text: "one", content: true}, %TextBlock{ text: "two", content: false}]
+    td = TextDocument.new("my title", tbs)
+    assert TextDocument.text(td, true, true) == "one\ntwo"
   end
 
   test ".debug_s returns detailed debug info" do
