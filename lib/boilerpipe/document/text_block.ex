@@ -44,8 +44,8 @@ defmodule Boilerpipe.Document.TextBlock do
 tl=#{text_block.tag_level}; \
 nw=#{text_block.num_words};\
 nwl=#{text_block.num_wrapped_lines};\
-ld=#{text_block.link_density}]\t#{
-      if text_block.content, do: "CONTENT", else: "BOILERPLATE"
-    },#{labels}\n#{text_block.text}"
+ld=#{text_block.link_density}]\t#{if text_block.content, do: "CONTENT", else: "BOILERPLATE"},#{
+      labels
+    }\n#{text_block.text}"
   end
 end

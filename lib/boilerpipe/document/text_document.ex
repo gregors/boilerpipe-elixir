@@ -29,6 +29,6 @@ defmodule Boilerpipe.Document.TextDocument do
   end
 
   def replace_text_blocks(%{text_blocks: _text_blocks} = td, new_blocks) do
-    %{ td | text_blocks: new_blocks }
+    %{td | text_blocks: new_blocks}
   end
 end
