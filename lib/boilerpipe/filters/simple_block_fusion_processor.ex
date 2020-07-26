@@ -1,5 +1,7 @@
 defmodule Boilerpipe.Filters.SimpleBlockFusionProcessor do
-  def process(%{text_blocks: text_blocks}) when length(text_blocks) > 2 do
+  alias Boilerpipe.Document.TextBlock
+
+  def process(%{text_blocks: text_blocks}=doc) when length(text_blocks) > 2 do
     new_text_blocks = merge(text_blocks, [])
     TextDocument.replace_text_blocks(doc, new_text_blocks)
   end

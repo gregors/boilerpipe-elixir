@@ -1,5 +1,6 @@
 defmodule Boilerpipe.Filters.BlockProximityFusion do
   alias Boilerpipe.Filters.BlockProximityFusion
+  alias Boilerpipe.Document.TextDocument
 
   defstruct max_blocks_distance: 0, content_only: false, same_tag_level_only: false
 
@@ -15,12 +16,12 @@ defmodule Boilerpipe.Filters.BlockProximityFusion do
 
   def process(%BlockProximityFusion{} = pf, %{text_blocks: text_blocks} = doc) do
     new_blocks = merge(pf, text_blocks, [])
-    TextDocument.replace_text_blocks!(doc, new_blocks)
+    TextDocument.replace_text_blocks(doc, new_blocks)
   end
 
   def merge(_pf, [first | []], acc), do: [first | acc] |> Enum.reverse()
 
-  def merge(pf, [first, second | tail], [] = acc) do
+  def merge(pf, [first, second | tail], acc) when is_list(acc) do
     diff_blocks = second.offset_blocks_start - first.offset_blocks_end - 1
 
     with true <- diff_blocks <= pf.max_blocks_distance,

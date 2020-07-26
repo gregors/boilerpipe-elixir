@@ -13,8 +13,8 @@ defmodule Boilerpipe.Document.TextBlock do
             num_full_text_words: 0,
             content: false
 
-  def new(text) do
-    %Boilerpipe.Document.TextBlock{text: text}
+  def new(text, offset_blocks \\ 0) do
+    %Boilerpipe.Document.TextBlock{text: text, offset_blocks_start: offset_blocks, offset_blocks_end: offset_blocks}
   end
 
   def set_tag_level(text_block, level) do
