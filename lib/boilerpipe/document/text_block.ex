@@ -14,7 +14,11 @@ defmodule Boilerpipe.Document.TextBlock do
             content: false
 
   def new(text, offset_blocks \\ 0) do
-    %Boilerpipe.Document.TextBlock{text: text, offset_blocks_start: offset_blocks, offset_blocks_end: offset_blocks}
+    %Boilerpipe.Document.TextBlock{
+      text: text,
+      offset_blocks_start: offset_blocks,
+      offset_blocks_end: offset_blocks
+    }
   end
 
   def set_tag_level(text_block, level) do
@@ -50,6 +54,10 @@ ld=#{text_block.link_density}]\t#{if text_block.content, do: "CONTENT", else: "B
   end
 
   def merge(block1, block2) do
-    %{block1 | text: block1.text <> "\n" <> block2.text }
+    %{
+      block1
+      | text: block1.text <> "\n" <> block2.text,
+        num_words: block1.num_words + block2.num_words
+    }
   end
 end

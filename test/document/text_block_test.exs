@@ -43,9 +43,16 @@ defmodule DocumentTextBlockTest do
   end
 
   test "merge/2 merges TextBlocks" do
-    block = TextBlock.new("hello")
+    block = %TextBlock{TextBlock.new("hello") | num_words: 1}
     another_block = TextBlock.new("good-bye")
     block = TextBlock.merge(block, another_block)
     assert block.text == "hello\ngood-bye"
+  end
+
+  test "merge/2 adds num_words" do
+    block = %TextBlock{text: "hello", num_words: 1}
+    another_block = %TextBlock{text: "good-bye", num_words: 1}
+    block = TextBlock.merge(block, another_block)
+    assert block.num_words == 2
   end
 end
