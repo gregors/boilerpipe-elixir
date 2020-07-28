@@ -60,7 +60,8 @@ ld=#{text_block.link_density}]\t#{if text_block.content, do: "CONTENT", else: "B
       num_words_in_anchor_text: block1.num_words_in_anchor_text + block2.num_words_in_anchor_text,
       num_words_in_wrapped_lines: block1.num_words_in_wrapped_lines + block2.num_words_in_wrapped_lines,
       num_wrapped_lines: block1.num_wrapped_lines + block2.num_wrapped_lines,
-      offset_blocks_start: min(block1.offset_blocks_start, block2.offset_blocks_start)
+      offset_blocks_start: min(block1.offset_blocks_start, block2.offset_blocks_start),
+      offset_blocks_end: max(block1.offset_blocks_end, block2.offset_blocks_end)
     }
   end
 end
