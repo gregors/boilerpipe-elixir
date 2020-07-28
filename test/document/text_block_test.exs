@@ -76,4 +76,11 @@ defmodule DocumentTextBlockTest do
     block = TextBlock.merge(block, another_block)
     assert block.num_wrapped_lines == 2
   end
+
+  test "merge/2 set the starting block index to the min of the two" do
+    block = %TextBlock{ offset_blocks_start: 5}
+    another_block = %TextBlock{ offset_blocks_start: 3}
+    block = TextBlock.merge(block, another_block)
+    assert block.offset_blocks_start == 3
+  end
 end
