@@ -1,6 +1,6 @@
 defmodule Boilerpipe.Filters.BlockProximityFusion do
   alias Boilerpipe.Filters.BlockProximityFusion
-  alias Boilerpipe.Document.TextDocument
+  alias Boilerpipe.Document.{TextBlock, TextDocument}
 
   defstruct max_blocks_distance: 0, content_only: false, same_tag_level_only: false
 

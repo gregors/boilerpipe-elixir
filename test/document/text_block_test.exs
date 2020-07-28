@@ -1,4 +1,4 @@
-defmodule DocumentTextBockTest do
+defmodule DocumentTextBlockTest do
   use ExUnit.Case
   alias Boilerpipe.Document.TextBlock
 
@@ -40,5 +40,12 @@ defmodule DocumentTextBockTest do
 
     tb = TextBlock.add_label(tb, :TITLE)
     assert Enum.count(tb.labels) == 1
+  end
+
+  test "merge/2 merges TextBlocks" do
+    block = TextBlock.new("hello")
+    another_block = TextBlock.new("good-bye")
+    block = TextBlock.merge(block, another_block)
+    assert block.text == "hello\ngood-bye"
   end
 end

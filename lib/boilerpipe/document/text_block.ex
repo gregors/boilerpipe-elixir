@@ -48,4 +48,8 @@ ld=#{text_block.link_density}]\t#{if text_block.content, do: "CONTENT", else: "B
       labels
     }\n#{text_block.text}"
   end
+
+  def merge(block1, block2) do
+    %{block1 | text: block1.text <> "\n" <> block2.text }
+  end
 end
