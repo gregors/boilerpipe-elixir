@@ -69,4 +69,11 @@ defmodule DocumentTextBlockTest do
     block = TextBlock.merge(block, another_block)
     assert block.num_words_in_wrapped_lines == 2
   end
+
+  test "merge/2 adds num_wrapped_lines" do
+    block = %TextBlock{}
+    another_block = %TextBlock{}
+    block = TextBlock.merge(block, another_block)
+    assert block.num_wrapped_lines == 2
+  end
 end
