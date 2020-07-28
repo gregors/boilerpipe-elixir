@@ -58,7 +58,8 @@ ld=#{text_block.link_density}]\t#{if text_block.content, do: "CONTENT", else: "B
       block1
       | text: block1.text <> "\n" <> block2.text,
         num_words: block1.num_words + block2.num_words,
-        num_words_in_anchor_text: block1.num_words_in_anchor_text + block2.num_words_in_anchor_text
+        num_words_in_anchor_text: block1.num_words_in_anchor_text + block2.num_words_in_anchor_text,
+        num_words_in_wrapped_lines: block1.num_words_in_wrapped_lines + block2.num_words_in_wrapped_lines
     }
   end
 end
