@@ -10,7 +10,6 @@ defmodule Boilerpipe.Document.TextBlock do
             link_density: 0.0,
             labels: %MapSet{},
             tag_level: 0,
-            num_full_text_words: 0,
             content: false
 
   def new(text, offset_blocks \\ 0) do
