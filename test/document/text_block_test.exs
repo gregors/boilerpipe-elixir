@@ -132,4 +132,13 @@ defmodule DocumentTextBlockTest do
     block = TextBlock.merge(b1, b2)
     assert block.labels == MapSet.new(["boom", "pow"])
   end
+
+  test "sets the tag level to the minimum of the two blocks" do
+    b1 = %TextBlock{tag_level: 2}
+    b2 = %TextBlock{tag_level: 1}
+
+    new_block = TextBlock.merge(b1, b2)
+
+    assert new_block.tag_level == 1
+  end
 end

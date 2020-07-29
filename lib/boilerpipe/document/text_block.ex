@@ -63,7 +63,8 @@ ld=#{text_block.link_density}]\t#{if text_block.content, do: "CONTENT", else: "B
         offset_blocks_start: min(b1.offset_blocks_start, b2.offset_blocks_start),
         offset_blocks_end: max(b1.offset_blocks_end, b2.offset_blocks_end),
         content: b1.content || b2.content,
-        labels: MapSet.union(b1.labels, b2.labels)
+        labels: MapSet.union(b1.labels, b2.labels),
+        tag_level: min(b1.tag_level, b2.tag_level)
     }
 
     %{new_block | text_density: text_density(new_block), link_density: link_density(new_block)}
