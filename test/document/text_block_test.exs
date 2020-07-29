@@ -124,4 +124,12 @@ defmodule DocumentTextBlockTest do
     block = TextBlock.merge(b1, b2)
     assert block.content == true
   end
+
+  test "merge/2 merges labels" do
+    b1 = %TextBlock{} |> TextBlock.add_label("boom")
+    b2 = TextBlock.add_label(b1, "pow")
+
+    block = TextBlock.merge(b1, b2)
+    assert block.labels == MapSet.new(["boom", "pow"])
+  end
 end
