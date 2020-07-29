@@ -5,16 +5,14 @@ defmodule Boilerpipe.Extractors.Default do
   #      doc.content
   #    end
 
-  def process(doc) do
+  def process(_doc) do
     # merge adjacent blocks with equal text_density
-    doc = Boilerpipe.Filters.SimpleBlockFusionProcessor.process(doc)
+    # doc = Boilerpipe.Filters.SimpleBlockFusionProcessor.process(doc)
 
     # merge text blocks next to each other
-    max_distance_1 = Boilerpipe.Filters.BlockProximityFusion.new(1, false, false)
+    # max_distance_1 = Boilerpipe.Filters.BlockProximityFusion.new(1, false, false)
 
     # marks text blocks as content / non-content using boilerpipe alg
-    # doc = filters::DensityRulesClassifier.process doc
-
-    doc
+    # Boilerpipe.Filters.DensityRulesClassifier.process(doc)
   end
 end
