@@ -24,7 +24,8 @@ defmodule Boilerpipe.Filters.BlockProximityFusion do
   def merge(pf, [first, second | tail], acc) when is_list(acc) do
     diff_blocks = second.offset_blocks_start - first.offset_blocks_end - 1
 
-    with true <- diff_blocks <= pf.max_blocks_distance,
+    with true <- second.content,
+         true <- diff_blocks <= pf.max_blocks_distance,
          false <- (!first.content || !second.content) && pf.content_only,
          false <- first.tag_level != second.tag_level && pf.same_tag_level_only do
       new_block = TextBlock.merge(first, second)
