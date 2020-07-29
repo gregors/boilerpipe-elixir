@@ -78,16 +78,39 @@ defmodule DocumentTextBlockTest do
   end
 
   test "merge/2 set the starting block index to the min of the two" do
-    block = %TextBlock{ offset_blocks_start: 5}
-    another_block = %TextBlock{ offset_blocks_start: 3}
+    block = %TextBlock{offset_blocks_start: 5}
+    another_block = %TextBlock{offset_blocks_start: 3}
     block = TextBlock.merge(block, another_block)
     assert block.offset_blocks_start == 3
   end
 
   test "merge/2 set the offset_block_end uses the later end" do
-    block = %TextBlock{ offset_blocks_end: 5}
-    another_block = %TextBlock{ offset_blocks_end: 3}
+    block = %TextBlock{offset_blocks_end: 5}
+    another_block = %TextBlock{offset_blocks_end: 3}
     block = TextBlock.merge(block, another_block)
     assert block.offset_blocks_end == 5
+  end
+
+  test 'merge/2 recomputes densities' do
+    block = %TextBlock{
+      text: "one",
+      num_words: 10,
+      num_words_in_anchor_text: 5,
+      num_words_in_wrapped_lines: 10,
+      num_wrapped_lines: 2
+    }
+
+    another_block = %TextBlock{
+      text: "two",
+      num_words: 10,
+      num_words_in_anchor_text: 5,
+      num_words_in_wrapped_lines: 10,
+      num_wrapped_lines: 3
+    }
+
+    block = TextBlock.merge(block, another_block)
+
+    assert block.text_density == 4.0
+    assert block.link_density == 0.5
   end
 end
