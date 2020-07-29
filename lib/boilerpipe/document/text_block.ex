@@ -6,15 +6,26 @@ defmodule Boilerpipe.Document.TextBlock do
             offset_blocks_start: 0,
             offset_blocks_end: 0,
             text: "",
-            text_density: 0,
+            text_density: 0.0,
             link_density: 0.0,
             labels: %MapSet{},
             tag_level: 0,
             content: false
 
-  def new(text, offset_blocks \\ 0) do
+  def new(
+        text,
+        num_words \\ 0,
+        num_words_in_anchor_text \\ 0,
+        num_words_in_wrapped_lines \\ 0,
+        num_wrapped_lines \\ 1,
+        offset_blocks \\ 0
+      ) do
     %Boilerpipe.Document.TextBlock{
       text: text,
+      num_words: num_words,
+      num_words_in_anchor_text: num_words_in_anchor_text,
+      num_words_in_wrapped_lines: num_words_in_wrapped_lines,
+      num_wrapped_lines: num_wrapped_lines,
       offset_blocks_start: offset_blocks,
       offset_blocks_end: offset_blocks
     }
