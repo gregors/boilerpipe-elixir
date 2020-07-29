@@ -52,19 +52,17 @@ ld=#{text_block.link_density}]\t#{if text_block.content, do: "CONTENT", else: "B
     }\n#{text_block.text}"
   end
 
-  def merge(block1, block2) do
+  def merge(b1, b2) do
     new_block = %{
-      block1
-      | text: block1.text <> "\n" <> block2.text,
-        num_words: block1.num_words + block2.num_words,
-        num_words_in_anchor_text:
-          block1.num_words_in_anchor_text + block2.num_words_in_anchor_text,
-        num_words_in_wrapped_lines:
-          block1.num_words_in_wrapped_lines + block2.num_words_in_wrapped_lines,
-        num_wrapped_lines: block1.num_wrapped_lines + block2.num_wrapped_lines,
-        offset_blocks_start: min(block1.offset_blocks_start, block2.offset_blocks_start),
-        offset_blocks_end: max(block1.offset_blocks_end, block2.offset_blocks_end),
-        content: block1.content || block2.content
+      b1
+      | text: b1.text <> "\n" <> b2.text,
+        num_words: b1.num_words + b2.num_words,
+        num_words_in_anchor_text: b1.num_words_in_anchor_text + b2.num_words_in_anchor_text,
+        num_words_in_wrapped_lines: b1.num_words_in_wrapped_lines + b2.num_words_in_wrapped_lines,
+        num_wrapped_lines: b1.num_wrapped_lines + b2.num_wrapped_lines,
+        offset_blocks_start: min(b1.offset_blocks_start, b2.offset_blocks_start),
+        offset_blocks_end: max(b1.offset_blocks_end, b2.offset_blocks_end),
+        content: b1.content || b2.content
     }
 
     %{new_block | text_density: text_density(new_block), link_density: link_density(new_block)}
