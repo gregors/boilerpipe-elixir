@@ -63,7 +63,8 @@ ld=#{text_block.link_density}]\t#{if text_block.content, do: "CONTENT", else: "B
           block1.num_words_in_wrapped_lines + block2.num_words_in_wrapped_lines,
         num_wrapped_lines: block1.num_wrapped_lines + block2.num_wrapped_lines,
         offset_blocks_start: min(block1.offset_blocks_start, block2.offset_blocks_start),
-        offset_blocks_end: max(block1.offset_blocks_end, block2.offset_blocks_end)
+        offset_blocks_end: max(block1.offset_blocks_end, block2.offset_blocks_end),
+        content: block1.content || block2.content
     }
 
     %{new_block | text_density: text_density(new_block), link_density: link_density(new_block)}

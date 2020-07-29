@@ -113,4 +113,15 @@ defmodule DocumentTextBlockTest do
     assert block.text_density == 4.0
     assert block.link_density == 0.5
   end
+
+  test "merge/2 if one block is content the merged block is content" do
+    b1 = %TextBlock{}
+    assert b1.content == false
+
+    b2 = %TextBlock{b1 | content: true}
+    assert b2.content == true
+
+    block = TextBlock.merge(b1, b2)
+    assert block.content == true
+  end
 end
