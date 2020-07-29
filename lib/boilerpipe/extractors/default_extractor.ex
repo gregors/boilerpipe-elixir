@@ -1,7 +1,7 @@
 defmodule Boilerpipe.Extractors.Default do
   #  def text(contents) do
   #      doc = ::Boilerpipe::SAX::BoilerpipeHTMLParser.parse(contents)
-  #      ::Boilerpipe::Extractors::DefaultExtractor.process doc
+  #      doc = process(doc)
   #      doc.content
   #    end
 
