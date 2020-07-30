@@ -59,7 +59,42 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
 
   def handle_event(:end_element, name, state) do
     IO.inspect("Finish parsing element #{name}")
-    {:ok, [{:end_element, name} | state]}
+
+    # TODO: get atom via a mapping function
+    tag = name |> String.upcase()
+
+    new_state =
+      case state.tag_actions[tag] do
+        {:ok, tag_action} ->
+          new_flush = tag_action.end_tag(name) || state.flush
+          %{state | flush: new_flush}
+
+        _ ->
+          %{state | flush: true}
+      end
+
+    tag_level =
+      cond do
+        tag_action == nil -> true
+        tag_action.changes_tag_level == true -> true
+        true -> false
+      end
+
+    if state.flush do
+      flush_block
+    end
+
+    [_head | label_stacks] = state.label_stacks
+
+    new_state = %{
+      new_state
+      | tag_level: tag_level,
+        last_event: :END_TAG,
+        label_stacks: label_stacks,
+        last_end_tag: tag
+    }
+
+    {:ok, new_state}
   end
 
   def handle_event(:characters, chars, state) do
