@@ -7,9 +7,8 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
       label_stacks: [],
       tag_actions: %{},
       tag_level: 0,
-      sb_last_was_whitespace: false,
-      text_buffer: "",
-      token_buffer: "",
+      text_buffer: [],
+      token_buffer: [],
       offset_blocks: 0,
       flush: false,
       block_tag_level: -1,
@@ -20,7 +19,8 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
       font_size_stack: [],
       last_start_tag: "",
       title: "",
-      text_blocks: []
+      text_blocks: [],
+      last_event: nil
     }
   end
 
@@ -62,15 +62,15 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
 
     # TODO: get atom via a mapping function
     tag = name |> String.upcase()
+    tag_action = state.tag_actions[tag]
 
     new_state =
-      case state.tag_actions[tag] do
-        {:ok, tag_action} ->
+      case tag_action do
+        nil ->
+          %{state | flush: true}
+        tag_action ->
           new_flush = tag_action.end_tag(name) || state.flush
           %{state | flush: new_flush}
-
-        _ ->
-          %{state | flush: true}
       end
 
     tag_level =
@@ -80,18 +80,16 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
         true -> false
       end
 
-    if state.flush do
-      flush_block
-    end
+    state = flush_block(state)
 
     [_head | label_stacks] = state.label_stacks
 
     new_state = %{
       new_state
       | tag_level: tag_level,
-        last_event: :END_TAG,
-        label_stacks: label_stacks,
-        last_end_tag: tag
+      last_event: :END_TAG,
+      label_stacks: label_stacks,
+      last_end_tag: tag
     }
 
     {:ok, new_state}
@@ -108,5 +106,60 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
     else
       state.tag_level
     end
+  end
+
+  def characters(%{in_ignorable_element?: true} = state, _text), do: state
+  def characters(state, text) when is_binary(text) and byte_size(text) < 1, do: state
+
+  def characters(state, text) do
+    state = flush_block(state)
+
+    # replace all whitespace with simple space
+    text = String.replace(text, ~r/\s+/, " ")
+
+    # trim whitespace
+    started_with_whitespace = (text =~ ~r/^\s/)
+    ended_with_whitespace = (text =~ ~r/\s$/)
+    text = String.trim(text)
+
+    #  add a single space if the block was only whitespace
+    case byte_size(text) == 0 do
+      true ->
+        append_space(state)
+      false ->
+        state
+        |> update_block_level()
+        |> append_space(started_with_whitespace)
+        |> append_text(text)
+        |> append_space(ended_with_whitespace)
+    end
+  end
+
+  def update_block_level(%{block_tag_level: -1} = state) do
+    IO.puts("-1 setting block level tag_level: #{state.tag_level}")
+    %{ state | block_tag_level: state.tag_level }
+  end
+
+  def update_block_level(state), do: state
+
+  def append_space(%{last_event: :WHITESPACE} = state), do: state
+
+  def append_space(state, false), do: state
+
+  def append_space(%{text_buffer: text_buffer, token_buffer: tokens} = state, _should_append=true) do
+    %{ state | last_event: :WHITESPACE,
+      text_buffer: [" ", text_buffer],
+      token_buffer: [" ", tokens] }
+  end
+
+  def append_text(%{text_buffer: text_buffer, token_buffer: tokens} = state, text) do
+    %{ state | last_event: :CHARACTERS,
+      text_buffer: [text, text_buffer],
+      token_buffer: [text, tokens] }
+  end
+
+  def flush_block(%{flush: false} = state), do: state
+  def flush_block(%{flish: true} = state) do
+    state
   end
 end
