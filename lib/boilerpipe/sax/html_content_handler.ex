@@ -68,6 +68,7 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
       case tag_action do
         nil ->
           %{state | flush: true}
+
         tag_action ->
           new_flush = tag_action.end_tag(name) || state.flush
           %{state | flush: new_flush}
@@ -87,9 +88,9 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
     new_state = %{
       new_state
       | tag_level: tag_level,
-      last_event: :END_TAG,
-      label_stacks: label_stacks,
-      last_end_tag: tag
+        last_event: :END_TAG,
+        label_stacks: label_stacks,
+        last_end_tag: tag
     }
 
     {:ok, new_state}
@@ -118,14 +119,15 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
     text = String.replace(text, ~r/\s+/, " ")
 
     # trim whitespace
-    started_with_whitespace = (text =~ ~r/^\s/)
-    ended_with_whitespace = (text =~ ~r/\s$/)
+    started_with_whitespace = text =~ ~r/^\s/
+    ended_with_whitespace = text =~ ~r/\s$/
     text = String.trim(text)
 
     #  add a single space if the block was only whitespace
     case byte_size(text) == 0 do
       true ->
         append_space(state)
+
       false ->
         state
         |> update_block_level()
@@ -137,7 +139,7 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
 
   def update_block_level(%{block_tag_level: -1} = state) do
     IO.puts("-1 setting block level tag_level: #{state.tag_level}")
-    %{ state | block_tag_level: state.tag_level }
+    %{state | block_tag_level: state.tag_level}
   end
 
   def update_block_level(state), do: state
@@ -146,19 +148,29 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
 
   def append_space(state, false), do: state
 
-  def append_space(%{text_buffer: text_buffer, token_buffer: tokens} = state, _should_append=true) do
-    %{ state | last_event: :WHITESPACE,
-      text_buffer: [" ", text_buffer],
-      token_buffer: [" ", tokens] }
+  def append_space(
+        %{text_buffer: text_buffer, token_buffer: tokens} = state,
+        _should_append = true
+      ) do
+    %{
+      state
+      | last_event: :WHITESPACE,
+        text_buffer: [" ", text_buffer],
+        token_buffer: [" ", tokens]
+    }
   end
 
   def append_text(%{text_buffer: text_buffer, token_buffer: tokens} = state, text) do
-    %{ state | last_event: :CHARACTERS,
-      text_buffer: [text, text_buffer],
-      token_buffer: [text, tokens] }
+    %{
+      state
+      | last_event: :CHARACTERS,
+        text_buffer: [text, text_buffer],
+        token_buffer: [text, tokens]
+    }
   end
 
   def flush_block(%{flush: false} = state), do: state
+
   def flush_block(%{flish: true} = state) do
     state
   end
