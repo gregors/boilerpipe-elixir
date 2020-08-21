@@ -88,9 +88,9 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
     new_state = %{
       new_state
       | tag_level: tag_level,
-      last_event: :END_TAG,
-      label_stacks: label_stacks,
-      last_end_tag: tag
+        last_event: :END_TAG,
+        label_stacks: label_stacks,
+        last_end_tag: tag
     }
 
     {:ok, new_state}
@@ -120,8 +120,8 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
 
     # trim whitespace
     started_with_whitespace = text =~ ~r/^\s/
-      ended_with_whitespace = text =~ ~r/\s$/
-        text = String.trim(text)
+    ended_with_whitespace = text =~ ~r/\s$/
+    text = String.trim(text)
 
     #  add a single space if the block was only whitespace
     case byte_size(text) == 0 do
@@ -149,14 +149,14 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
   def append_space(state, false), do: state
 
   def append_space(
-    %{text_buffer: text_buffer, token_buffer: tokens} = state,
-    _should_append = true
-  ) do
+        %{text_buffer: text_buffer, token_buffer: tokens} = state,
+        _should_append = true
+      ) do
     %{
       state
       | last_event: :WHITESPACE,
-      text_buffer: [" ", text_buffer],
-      token_buffer: [" ", tokens]
+        text_buffer: [" ", text_buffer],
+        token_buffer: [" ", tokens]
     }
   end
 
@@ -164,8 +164,8 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
     %{
       state
       | last_event: :CHARACTERS,
-      text_buffer: [text, text_buffer],
-      token_buffer: [text, tokens]
+        text_buffer: [text, text_buffer],
+        token_buffer: [text, tokens]
     }
   end
 
@@ -173,23 +173,28 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
 
   # we're not in body tag
   def flush_block(%{flush: true, in_body: 0} = state) do
-    state = %{ state | flush: false }
+    state = %{state | flush: false}
 
     if state.last_start_tag == :TITLE do
-      title = state.token_buffer |> Enum.join(" ") |> String.trim
-      %{ state | text_buffer: [], token_buffer: [], title: title }
+      title = state.token_buffer |> Enum.join(" ") |> String.trim()
+      %{state | text_buffer: [], token_buffer: [], title: title}
     else
       state
     end
   end
 
   def flush_block(%{flush: true} = state) do
-    state = %{ state | flush: false }
+    state = %{state | flush: false}
 
     cond do
-      state.token_buffer.size == 0 -> state
-      state.token_buffer.size == 1 && state.last_event == :WHITESPACE -> %{ state | text_buffer: [], token_buffer: [] }
-      true -> state
+      state.token_buffer.size == 0 ->
+        state
+
+      state.token_buffer.size == 1 && state.last_event == :WHITESPACE ->
+        %{state | text_buffer: [], token_buffer: []}
+
+      true ->
+        state
         num_words = 0
         num_words_current_line = 0
         num_words_in_wrapped_lines = 0
@@ -198,53 +203,64 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
         current_line_length = 0
         max_line_length = 80
 
-      tokens = Boilerpipe.Util.UnicodeTokenizer.tokenize(state.token_buffer)
-      tokens |> Enum.each(fn token ->
-        cond do
-          ANCHOR_TEXT_START == token -> %{state | in_anchor_text: true}
-          ANCHOR_TEXT_END == token -> %{state | in_anchor_text: false}
-          is_word?(token) ->
-            num_words = num_words + 1
-            num_words_current_line =  num_words_current_line + 1
+        tokens =
+          state.token_buffer
+          |> Enum.join(" ")
+          |> Boilerpipe.Util.UnicodeTokenizer.tokenize()
 
-            num_linked_words = if state.in_anchor_text do
-              num_linked_words + 1
-            else
-              num_linked_words
-            end
+        tokens
+        |> Enum.each(fn token ->
+          cond do
+            ANCHOR_TEXT_START == token ->
+              %{state | in_anchor_text: true}
 
-            token_length = byte_size(token)
-            current_line_length = current_line_length + token_length + 1
+            ANCHOR_TEXT_END == token ->
+              %{state | in_anchor_text: false}
 
-            if current_line_length > max_line_length do
-              num_wrapped_lines =  num_wrapped_lines + 1
-              current_line_length = token_length
-              num_words_current_line = 1
-            end
+            is_word?(token) ->
+              num_words = num_words + 1
+              num_words_current_line = num_words_current_line + 1
+
+              num_linked_words =
+                if state.in_anchor_text do
+                  num_linked_words + 1
+                else
+                  num_linked_words
+                end
+
+              token_length = byte_size(token)
+              current_line_length = current_line_length + token_length + 1
+
+              if current_line_length > max_line_length do
+                num_wrapped_lines = num_wrapped_lines + 1
+                current_line_length = token_length
+                num_words_current_line = 1
+              end
+          end
+        end)
+
+        #      return if tokens.empty?
+        #
+        num_words_in_wrapped_lines = 0
+
+        if num_wrapped_lines == 0 do
+          num_words_in_wrapped_lines = num_words
+          num_wrapped_lines = 1
+        else
+          num_words_in_wrapped_lines = num_words - num_words_current_line
         end
-      end)
 
-#      return if tokens.empty?
-#
-      num_words_in_wrapped_lines = 0
-      if num_wrapped_lines == 0 do
-        num_words_in_wrapped_lines = num_words
-        num_wrapped_lines = 1
-      else
-        num_words_in_wrapped_lines = num_words - num_words_current_line
-      end
-#
-#      text_block = ::Boilerpipe::Document::TextBlock.new(@text_buffer.strip,
-#                                                         num_words,
-#                                                         num_linked_words,
-#                                                         num_words_in_wrapped_lines,
-#                                                         num_wrapped_lines, @offset_blocks)
-#
-#      @offset_blocks += 1
-#      clear_buffers
-#      text_block.set_tag_level(@block_tag_level)
-#      add_text_block(text_block)
-#      @block_tag_level = -1
+        #      text_block = ::Boilerpipe::Document::TextBlock.new(@text_buffer.strip,
+        #                                                         num_words,
+        #                                                         num_linked_words,
+        #                                                         num_words_in_wrapped_lines,
+        #                                                         num_wrapped_lines, @offset_blocks)
+        #
+        #      @offset_blocks += 1
+        #      clear_buffers
+        #      text_block.set_tag_level(@block_tag_level)
+        #      add_text_block(text_block)
+        #      @block_tag_level = -1
     end
   end
 
