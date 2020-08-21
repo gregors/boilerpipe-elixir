@@ -171,7 +171,15 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
 
   def flush_block(%{flush: false} = state), do: state
 
-  def flush_block(%{flish: true} = state) do
-    state
+  # we're not in body tag
+  def flush_block(%{flush: true, in_body: 0} = state) do
+    state = %{ state | flush: false }
+
+    state = if state.last_start_tag == :TITLE do
+      title = state.token_buffer |> Enum.join(" ") |> String.trim
+      %{ state | text_buffer: [], token_buffer: [], title: title }
+    else
+      state
+    end
   end
 end
