@@ -50,7 +50,7 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
           %{new_state | tag_level: tag_level, flush: flush}
 
         _ ->
-          %{new_state | tag_level: new_state.tag_level + 1, flush: true}
+          %{new_state | tag_level: state.tag_level + 1, flush: true}
       end
 
     new_state = %{new_state | last_event: :START_TAG, last_start_tag: tag}
@@ -77,9 +77,9 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
 
     tag_level =
       cond do
-        tag_action == nil -> true
-        tag_action.changes_tag_level == true -> true
-        true -> false
+        tag_action == nil -> state.tag_level - 1
+        tag_action.changes_tag_level == true -> state.tag_level - 1
+        true -> state.tag_level
       end
 
     state = flush_block(state)
