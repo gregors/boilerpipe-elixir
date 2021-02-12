@@ -1,11 +1,28 @@
+defmodule Boilerpipe.TagActions.IgnorableElement do
+  def start(name, attrs) do
+    IO.puts("Ignore start")
+  end
+
+  def end_tag(name, attrs) do
+    IO.puts("Ignore end")
+  end
+
+  def changes_tag_level? do
+    true
+  end
+end
+
 defmodule Boilerpipe.SAX.HtmlContentHandler do
   @behaviour Saxy.Handler
 
   # tag_actions = ::Boilerpipe::SAX::TagActionMap.tag_actions
+
   def new do
+    tag_actions = %{ "SCRIPT" => Boilerpipe.TagActions.IgnorableElement}
+
     %{
       label_stacks: [],
-      tag_actions: %{},
+      tag_actions: tag_actions,
       tag_level: 0,
       text_buffer: [],
       token_buffer: [],
@@ -40,10 +57,11 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
     new_state = %{state | label_stacks: [nil | state.label_stacks]}
 
     # TODO: get atom via a mapping function
-    tag = name |> String.upcase()
+    tag = name |> String.upcase() |> IO.inspect
+    state.tag_actions[tag] |> IO.inspect
 
     new_state =
-      case state.tag_actions[tag] do
+      case Map.fetch(state.tag_actions, tag) do
         {:ok, tag_action} ->
           tag_level = tag_level(tag_action, new_state)
           flush = tag_action.start(name, attrs) || new_state.flush
@@ -53,7 +71,7 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
           %{new_state | tag_level: state.tag_level + 1, flush: true}
       end
 
-    new_state = %{new_state | last_event: :START_TAG, last_start_tag: tag}
+    new_state = %{new_state | last_event: :START_TAG, last_start_tag: tag} |> IO.inspect
 
     {:ok, new_state}
   end
@@ -105,7 +123,7 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
   end
 
   def tag_level(tag_action, state) do
-    if tag_action.changes_tag_level do
+    if tag_action.changes_tag_level? do
       state.tag_level + 1
     else
       state.tag_level
@@ -148,13 +166,13 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
   def update_block_level(state), do: state
 
   def append_space(%{last_event: :WHITESPACE} = state), do: state
+  def append_space(%{text_buffer: text_buffer, token_buffer: tokens} = state) do
+    %{ state | last_event: :WHITESPACE, text_buffer: [" " | text_buffer], token_buffer: [" " |  tokens] }
+  end
 
   def append_space(state, false), do: state
 
-  def append_space(
-        %{text_buffer: text_buffer, token_buffer: tokens} = state,
-        _should_append = true
-      ) do
+  def append_space( %{text_buffer: text_buffer, token_buffer: tokens} = state, _should_append = true) do
     %{
       state
       | last_event: :WHITESPACE,
@@ -162,6 +180,11 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
         token_buffer: [" ", tokens]
     }
   end
+
+  def append_space(state) do
+    state |> IO.inspect
+  end
+
 
   def append_text(%{text_buffer: text_buffer, token_buffer: tokens} = state, text) do
     %{
