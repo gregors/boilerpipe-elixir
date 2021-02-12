@@ -1,11 +1,13 @@
 defmodule Boilerpipe.Extractors.Default do
-  #  def text(contents) do
-  #      doc = ::Boilerpipe::SAX::BoilerpipeHTMLParser.parse(contents)
-  #      doc = process(doc)
-  #      doc.content
-  #    end
+  def text(content) do
+    { :ok, doc } = Boilerpipe.SAX.Parser.parse(content)
+    doc = process(doc)
+    doc.text_buffer |> Enum.join(" ")
+  end
 
-  def process(_doc) do
+  def process(doc) do
+    doc |> IO.inspect
+    doc
     # merge adjacent blocks with equal text_density
     # doc = Boilerpipe.Filters.SimpleBlockFusionProcessor.process(doc)
 
