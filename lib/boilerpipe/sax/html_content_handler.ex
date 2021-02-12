@@ -62,6 +62,7 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
     IO.inspect("Finish parsing element #{name}")
 
     # TODO: get atom via a mapping function
+    # TODO: make tag actions
     tag = name |> String.upcase()
     tag_action = state.tag_actions[tag]
 
@@ -99,7 +100,8 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
 
   def handle_event(:characters, chars, state) do
     IO.inspect("Receive characters #{chars}")
-    {:ok, [{:chacters, chars} | state]}
+    new_state = characters(state, chars)
+    {:ok, new_state}
   end
 
   def tag_level(tag_action, state) do
