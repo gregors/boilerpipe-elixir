@@ -18,6 +18,7 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
       in_anchor_text: false,
       font_size_stack: [],
       last_start_tag: "",
+      last_end_tag: "",
       title: "",
       text_blocks: [],
       last_event: nil
