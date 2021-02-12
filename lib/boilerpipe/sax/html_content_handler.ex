@@ -165,8 +165,8 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
     %{
       state
       | last_event: :CHARACTERS,
-        text_buffer: [text, text_buffer],
-        token_buffer: [text, tokens]
+        text_buffer: [text | state.text_buffer],
+        token_buffer: [text | state.token_buffer]
     }
   end
 
