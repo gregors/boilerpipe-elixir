@@ -1,8 +1,8 @@
 defmodule Boilerpipe.SAX.Parser do
-  def parse(html) do
-    # preprocessing
-    html = String.replace(html, ~r/<script.+<\/script>/is, "")
+  alias Boilerpipe.SAX.Preprocessor
 
+  def parse(html) do
+    html = Preprocessor.strip(html)
     state = Boilerpipe.SAX.HtmlContentHandler.new()
     Saxy.parse_string(html, Boilerpipe.SAX.HtmlContentHandler, state)
   end
