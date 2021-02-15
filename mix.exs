@@ -21,7 +21,7 @@ defmodule Boilerpipe.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:saxy, "~> 1.3"}
+      {:sax_html, "~> 0.1.0"}
     ]
   end
 end

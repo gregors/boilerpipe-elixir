@@ -13,8 +13,6 @@ defmodule Boilerpipe.TagActions.IgnorableElement do
 end
 
 defmodule Boilerpipe.SAX.HtmlContentHandler do
-  @behaviour Saxy.Handler
-
   # tag_actions = ::Boilerpipe::SAX::TagActionMap.tag_actions
 
   def new do
@@ -40,16 +38,6 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
       text_blocks: [],
       last_event: nil
     }
-  end
-
-  def handle_event(:start_document, _prolog, state) do
-    IO.inspect("Start parsing document")
-    {:ok, state}
-  end
-
-  def handle_event(:end_document, _data, state) do
-    IO.inspect("Finish parsing document")
-    {:ok, state}
   end
 
   def handle_event(:start_element, {name, attrs}, state) do
