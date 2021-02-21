@@ -40,19 +40,20 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
     }
   end
 
-  def handle_event(:start_element, {name, attrs}, state) do
-    IO.inspect("Start parsing element #{name} with attributes #{inspect(attrs)}")
+  def handle_event({:start_tag, tag, state}) do
+    IO.inspect("Start parsing element #{tag}")
+    attrs = ""
     new_state = %{state | label_stacks: [nil | state.label_stacks]}
 
     # TODO: get atom via a mapping function
-    tag = name |> String.upcase() |> IO.inspect
+    tag = tag |> String.upcase()
     state.tag_actions[tag] |> IO.inspect
 
     new_state =
       case Map.fetch(state.tag_actions, tag) do
         {:ok, tag_action} ->
           tag_level = tag_level(tag_action, new_state)
-          flush = tag_action.start(name, attrs) || new_state.flush
+          flush = tag_action.start(tag, attrs) || new_state.flush
           %{new_state | tag_level: tag_level, flush: flush}
 
         _ ->
@@ -61,15 +62,15 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
 
     new_state = %{new_state | last_event: :START_TAG, last_start_tag: tag} |> IO.inspect
 
-    {:ok, new_state}
+    new_state
   end
 
-  def handle_event(:end_element, name, state) do
-    IO.inspect("Finish parsing element #{name}")
+  def handle_event({:end_tag, tag, state}) do
+    IO.inspect("Finish parsing element #{tag}")
 
     # TODO: get atom via a mapping function
     # TODO: make tag actions
-    tag = name |> String.upcase()
+    tag = tag |> String.upcase()
     tag_action = state.tag_actions[tag]
 
     new_state =
@@ -78,7 +79,7 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
           %{state | flush: true}
 
         tag_action ->
-          new_flush = tag_action.end_tag(name) || state.flush
+          new_flush = tag_action.end_tag(tag) || state.flush
           %{state | flush: new_flush}
       end
 
@@ -101,13 +102,13 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
         last_end_tag: tag
     }
 
-    {:ok, new_state}
+    new_state
   end
 
-  def handle_event(:characters, chars, state) do
+  def handle_event({:characters, chars, state}) do
     IO.inspect("Receive characters #{chars}")
     new_state = characters(state, chars)
-    {:ok, new_state}
+    new_state
   end
 
   def tag_level(tag_action, state) do
