@@ -7,7 +7,6 @@ defmodule Boilerpipe.Extractors.Default do
 
   def process(doc) do
     doc |> IO.inspect
-    doc
     # merge adjacent blocks with equal text_density
     # doc = Boilerpipe.Filters.SimpleBlockFusionProcessor.process(doc)
 
