@@ -2,6 +2,7 @@ defmodule Boilerpipe.SAX.Preprocessor do
   def strip(text) do
     text
     |> String.replace(~r/<script.+?<\/script>/mis, "")
+    |> String.replace(~r/&nbsp;?/mis, " ")
     |> String.replace(~r/<svg.+?<\/svg>/is, "")
     |> String.replace(~r/<link.+?\/>/is, "")
     |> String.replace(~r/<meta[^>]+>/is, "")
