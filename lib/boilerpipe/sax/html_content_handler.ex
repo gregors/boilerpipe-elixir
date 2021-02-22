@@ -1,10 +1,35 @@
 defmodule Boilerpipe.TagActions.IgnorableElement do
-  def start(name, attrs) do
+  def start(name) do
     IO.puts("Ignore start")
+    true
   end
 
-  def end_tag(name, attrs) do
+  def end_tag(name) do
     IO.puts("Ignore end")
+    true
+  end
+
+  def changes_tag_level? do
+    true
+  end
+end
+
+defmodule Boilerpipe.TagActions.AnchorText do
+  def start(name) do
+#      if handler.in_anchor_tag?
+#        handler.in_anchor_tag += 1
+#        nested_achor_tag_error_recovering(handler, name)
+#        return
+#      else
+#        handler.in_anchor_tag += 1
+#      end
+#
+#      append_anchor_text_start(handler) unless handler.in_ignorable_element?
+      false
+  end
+
+  def end_tag(name) do
+    true
   end
 
   def changes_tag_level? do
@@ -16,7 +41,18 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
   # tag_actions = ::Boilerpipe::SAX::TagActionMap.tag_actions
 
   def new do
-    tag_actions = %{ "SCRIPT" => Boilerpipe.TagActions.IgnorableElement}
+    tag_actions = %{
+      "APPLET" => Boilerpipe.TagActions.IgnorableElement,
+      "EMBED" => Boilerpipe.TagActions.IgnorableElement,
+      "LINK" => Boilerpipe.TagActions.IgnorableElement,
+      "OPTION" => Boilerpipe.TagActions.IgnorableElement,
+      "OBJECT" => Boilerpipe.TagActions.IgnorableElement,
+      "SCRIPT" => Boilerpipe.TagActions.IgnorableElement,
+      "STYLE" => Boilerpipe.TagActions.IgnorableElement,
+
+      "A" => Boilerpipe.TagActions.AnchorText,
+      "BODY" => Boilerpipe.TagActions.AnchorText,
+    }
 
     %{
       label_stacks: [],
@@ -42,25 +78,24 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
 
   def handle_event({:start_tag, tag, state}) do
     IO.inspect("Start parsing element #{tag}")
-    attrs = ""
     new_state = %{state | label_stacks: [nil | state.label_stacks]}
 
     # TODO: get atom via a mapping function
     tag = tag |> String.upcase()
-    state.tag_actions[tag] |> IO.inspect
+    #state.tag_actions[tag] |> IO.inspect
 
     new_state =
       case Map.fetch(state.tag_actions, tag) do
         {:ok, tag_action} ->
           tag_level = tag_level(tag_action, new_state)
-          flush = tag_action.start(tag, attrs) || new_state.flush
+          flush = tag_action.start(tag) || new_state.flush
           %{new_state | tag_level: tag_level, flush: flush}
 
         _ ->
           %{new_state | tag_level: state.tag_level + 1, flush: true}
       end
 
-    new_state = %{new_state | last_event: :START_TAG, last_start_tag: tag} |> IO.inspect
+    new_state = %{new_state | last_event: :START_TAG, last_start_tag: tag}
 
     new_state
   end
@@ -86,7 +121,7 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
     tag_level =
       cond do
         tag_action == nil -> state.tag_level - 1
-        tag_action.changes_tag_level == true -> state.tag_level - 1
+        tag_action.changes_tag_level? -> state.tag_level - 1
         true -> state.tag_level
       end
 
@@ -97,16 +132,16 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
     new_state = %{
       new_state
       | tag_level: tag_level,
-        last_event: :END_TAG,
-        label_stacks: label_stacks,
-        last_end_tag: tag
+      last_event: :END_TAG,
+      label_stacks: label_stacks,
+      last_end_tag: tag
     }
 
     new_state
   end
 
   def handle_event({:characters, chars, state}) do
-    IO.inspect("Receive characters #{chars}")
+    # IO.inspect("Receive characters #{chars}")
     new_state = characters(state, chars)
     new_state
   end
@@ -130,8 +165,8 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
 
     # trim whitespace
     started_with_whitespace = text =~ ~r/^\s/
-    ended_with_whitespace = text =~ ~r/\s$/
-    text = String.trim(text)
+      ended_with_whitespace = text =~ ~r/\s$/
+        text = String.trim(text)
 
     #  add a single space if the block was only whitespace
     case byte_size(text) == 0 do
@@ -165,13 +200,14 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
     %{
       state
       | last_event: :WHITESPACE,
-        text_buffer: [" ", text_buffer],
-        token_buffer: [" ", tokens]
+      text_buffer: [" ", text_buffer],
+      token_buffer: [" ", tokens]
     }
   end
 
   def append_space(state) do
-    state |> IO.inspect
+    # state |> IO.inspect
+    state
   end
 
 
@@ -179,8 +215,8 @@ defmodule Boilerpipe.SAX.HtmlContentHandler do
     %{
       state
       | last_event: :CHARACTERS,
-        text_buffer: [text | state.text_buffer],
-        token_buffer: [text | state.token_buffer]
+      text_buffer: [text | state.text_buffer],
+      token_buffer: [text | state.token_buffer]
     }
   end
 
